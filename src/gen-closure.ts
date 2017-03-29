@@ -66,7 +66,7 @@ function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[])
   if (mixin.mixins && mixin.mixins.length > 0) {
     mixin.mixins.forEach((m) => {
       const {name, namespace} = getNamespaceAndName(m.identifier);
-      mixinDesc.push(`* @implements {${namespace}_${name}}`);
+      mixinDesc.push(`* @extends {${namespace}_${name}}`);
     });
   }
 
