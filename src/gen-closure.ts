@@ -55,28 +55,32 @@ function generatePackage(pkg: Package) {
 }
 
 function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[]) {
-  const { name, namespace: namespaceName } = getNamespaceAndName(mixin.name);
-  if (namespaceName !== 'Polymer') {
+  const {name, namespace} = getNamespaceAndName(mixin.name);
+  if (namespace !== 'Polymer') {
     // TODO: handle non-Polymer namespaces
     return;
   }
+  let mixinName = `${namespace}_${name}`;
   let mixinDesc = ['/**', '* @record'];
 
   if (mixin.mixins && mixin.mixins.length > 0) {
-    mixin.mixins.forEach((m) => mixinDesc.push('* @implements {' + getNamespaceAndName(m.identifier).name + '}'))
+    mixin.mixins.forEach((m) => {
+      const {name, namespace} = getNamespaceAndName(m.identifier);
+      mixinDesc.push(`* @implements {${namespace}_${name}}`);
+    });
   }
 
-  mixinDesc.push('*/', `function ${name}(){}`);
+  mixinDesc.push('*/', `function ${mixinName}(){}`);
 
   for (const property of mixin.properties) {
-    const propertyText = genProperty(name as string, property);
+    const propertyText = genProperty(mixinName, property);
     if (propertyText) {
       mixinDesc.push(propertyText);
     }
   }
 
   for (const method of mixin.methods) {
-    const methodText = genMethod(name as string, method);
+    const methodText = genMethod(mixinName, method);
     if (methodText) {
       mixinDesc.push(methodText);
     }
@@ -118,10 +122,17 @@ function genMethod(mixinName: string, method: Method): string | undefined {
   }
   out.push('*/');
   const paramText = method.params
-    ? method.params.map((p) => p.name).join(', ')
+    ? method.params.map((p) => cleanVarArgs(p.name)).join(', ')
     : '';
   out.push(`${mixinName}.prototype.${method.name} = function(${paramText}){};`);
   return out.join('\n');
+}
+
+function cleanVarArgs(name: string) {
+  if (name.startsWith('...')) {
+    return name.slice(3);
+  }
+  return name;
 }
 
 /**
@@ -130,7 +141,7 @@ function genMethod(mixinName: string, method: Method): string | undefined {
  * @param parameter
  */
 function genParameter(parameter: { name: string; type?: string; }) {
-  return `* @param {${parameter.type || '*'}} ${parameter.name}`;
+  return `* @param {${parameter.type || '*'}} ${cleanVarArgs(parameter.name)}`;
 }
 
 function getNamespaceAndName(name: string): { name?: string, namespace?: string } {
@@ -138,7 +149,7 @@ function getNamespaceAndName(name: string): { name?: string, namespace?: string 
     const lastDotIndex = name.lastIndexOf('.');
     if (lastDotIndex !== -1) {
       return {
-        name: 'Polymer_' + name.substring(lastDotIndex + 1, name.length),
+        name: name.substring(lastDotIndex + 1, name.length),
         namespace: name.substring(0, lastDotIndex)
       };
     }
