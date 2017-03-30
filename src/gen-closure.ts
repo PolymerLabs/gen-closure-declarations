@@ -25,7 +25,7 @@ const header =
  *
  * This file is generated, do not edit manually
  */
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars, strict */
 `;
 
 export function generateDeclarations() {
@@ -56,10 +56,6 @@ function generatePackage(pkg: Package) {
 
 function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[]) {
   const {name, namespace} = getNamespaceAndName(mixin.name);
-  if (namespace !== 'Polymer') {
-    // TODO: handle non-Polymer namespaces
-    return;
-  }
   let mixinName = `${namespace}_${name}`;
   let mixinDesc = ['/**', '* @record'];
 
@@ -109,10 +105,17 @@ function genProperty(mixinName: string, property: Property): string | undefined 
  * @param indent
  */
 function genMethod(mixinName: string, method: Method): string | undefined {
-  if (method.privacy === 'private' || method.inheritedFrom != null) {
+  let override = false;
+  if (method.privacy === 'private') {
     return;
   }
+  if (method.jsdoc && method.jsdoc.tags && method.jsdoc.tags.some(t => t.tag === 'override')) {
+    override = true;
+  }
   let out = ['/**'];
+  if (override) {
+    out.push('* @override');
+  }
   if (method.params) {
     method.params.forEach(p => out.push(genParameter(p)));
   }
