@@ -9,7 +9,9 @@
  */
 // Requires node >= 7.6
 
-import { Analyzer, Feature, Package, FSUrlLoader, PackageUrlResolver, Property, Method, PolymerElementMixin } from 'polymer-analyzer';
+import { Analyzer, Feature, FSUrlLoader, PackageUrlResolver, Property, Method, PolymerElementMixin } from 'polymer-analyzer';
+
+import {Analysis} from 'polymer-analyzer/lib/model/model';
 
 const isInTestsRegex = /(\b|\/|\\)(test[s]?)(\/|\\)/;
 const isTest = (f: Feature) => f.sourceRange && isInTestsRegex.test(f.sourceRange.file);
@@ -34,10 +36,10 @@ export function generateDeclarations() {
     urlResolver: new PackageUrlResolver(),
   });
 
-  analyzer.analyzePackage().then(generatePackage);
+analyzer.analyzePackage().then(generatePackage);
 }
 
-function generatePackage(pkg: Package) {
+function generatePackage(pkg: Analysis) {
   const declarations:string[] = [header];
 
   const features = pkg.getFeatures();

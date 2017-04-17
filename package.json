@@ -7,6 +7,6 @@
   "license": "MIT",
   "dependencies": {
     "escodegen": "^1.8.1",
-    "polymer-analyzer": "next"
+    "polymer-analyzer": "^2.0.0-alpha.38"
   }
 }
