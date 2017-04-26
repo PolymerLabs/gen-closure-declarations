@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Polymer/gen-typescript-declarations.git"
+    "url": "git+https://github.com/Polymer/gen-closure-declarations.git"
   },
   "author": "Daniel Freedman <dfreedm@google.com>",
   "license": "BSD-3-Clause",
@@ -24,7 +24,7 @@
   },
   "description": "Generate TypeScript declarations from Polymer Analyzer output",
   "bugs": {
-    "url": "https://github.com/Polymer/gen-typescript-declarations/issues"
+    "url": "https://github.com/Polymer/gen-closure-declarations/issues"
   },
-  "homepage": "https://github.com/Polymer/gen-typescript-declarations#readme"
+  "homepage": "https://github.com/Polymer/gen-closure-declarations#readme"
 }
