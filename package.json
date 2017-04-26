@@ -1,15 +1,18 @@
 {
-  "name": "gen-typescript-declarations",
+  "name": "gen-closure-declarations",
   "version": "0.0.0",
   "main": "lib/gen-closure.js",
   "bin": {
     "gen-closure-declarations": "bin/gen-closure-declarations.js"
   },
   "repository": "https://github.com/Polymer/gen-typescript-declarations.git",
-  "author": "Justin Fagnani <justinfagnani@google.com>",
+  "author": "Daniel Freedman <dfreedm@google.com>",
   "license": "MIT",
   "dependencies": {
     "escodegen": "^1.8.1",
     "polymer-analyzer": "^2.0.0-alpha.38"
+  },
+  "devDependencies": {
+    "typescript": "^2.2.2"
   }
 }
