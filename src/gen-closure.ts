@@ -30,16 +30,16 @@ const header =
 /* eslint-disable no-unused-vars, strict */
 `;
 
-export function generateDeclarations() {
+export function generateDeclarations():Promise<string> {
   const analyzer = new Analyzer({
     urlLoader: new FSUrlLoader(),
     urlResolver: new PackageUrlResolver(),
   });
 
-analyzer.analyzePackage().then(generatePackage);
+  return analyzer.analyzePackage().then(generatePackage);
 }
 
-function generatePackage(pkg: Analysis) {
+function generatePackage(pkg: Analysis):string {
   const declarations:string[] = [header];
 
   const features = pkg.getFeatures();
@@ -53,7 +53,7 @@ function generatePackage(pkg: Analysis) {
     }
   }
 
-  process.stdout.write(declarations.join('\n'));
+  return declarations.join('\n');
 }
 
 function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[]) {
@@ -161,5 +161,3 @@ function getNamespaceAndName(name: string): { name?: string, namespace?: string 
   }
   return { name };
 }
-
-generateDeclarations()

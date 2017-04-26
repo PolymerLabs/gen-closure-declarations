@@ -1,7 +1,10 @@
 {
   "name": "gen-typescript-declarations",
   "version": "0.0.0",
-  "main": "index.js",
+  "main": "lib/gen-closure.js",
+  "bin": {
+    "gen-closure-declarations": "bin/gen-closure-declarations.js"
+  },
   "repository": "https://github.com/Polymer/gen-typescript-declarations.git",
   "author": "Justin Fagnani <justinfagnani@google.com>",
   "license": "MIT",
