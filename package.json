@@ -1,6 +1,6 @@
 {
   "name": "@polymer/gen-closure-declarations",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "lib/gen-closure.js",
   "bin": {
     "gen-closure-declarations": "bin/gen-closure-declarations.js"
