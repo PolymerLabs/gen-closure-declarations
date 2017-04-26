@@ -5,9 +5,12 @@
   "bin": {
     "gen-closure-declarations": "bin/gen-closure-declarations.js"
   },
-  "repository": "https://github.com/Polymer/gen-typescript-declarations.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Polymer/gen-typescript-declarations.git"
+  },
   "author": "Daniel Freedman <dfreedm@google.com>",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "dependencies": {
     "escodegen": "^1.8.1",
     "polymer-analyzer": "^2.0.0-alpha.38"
@@ -18,5 +21,10 @@
   "scripts": {
     "build": "tsc",
     "prepublish": "npm run build"
-  }
+  },
+  "description": "Generate TypeScript declarations from Polymer Analyzer output",
+  "bugs": {
+    "url": "https://github.com/Polymer/gen-typescript-declarations/issues"
+  },
+  "homepage": "https://github.com/Polymer/gen-typescript-declarations#readme"
 }
