@@ -70,19 +70,19 @@ function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[])
 
   mixinDesc.push('*/', `function ${mixinName}(){}`);
 
-  for (const property of mixin.properties) {
+  mixin.properties.forEach((property) => {
     const propertyText = genProperty(mixinName, property);
     if (propertyText) {
       mixinDesc.push(propertyText);
     }
-  }
+  });
 
-  for (const method of mixin.methods) {
+  mixin.methods.forEach((method) => {
     const methodText = genMethod(mixinName, method);
     if (methodText) {
       mixinDesc.push(methodText);
     }
-  }
+  });
 
   declarations.push(mixinDesc.join('\n'));
 }
@@ -111,7 +111,7 @@ function genMethod(mixinName: string, method: Method): string | undefined {
   if (method.privacy === 'private') {
     return;
   }
-  if (method.jsdoc && method.jsdoc.tags && method.jsdoc.tags.some(t => t.tag === 'override')) {
+  if (method.jsdoc && method.jsdoc.tags && method.jsdoc.tags.some(t => t.title === 'override')) {
     override = true;
   }
   let out = ['/**'];
