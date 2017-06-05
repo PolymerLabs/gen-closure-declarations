@@ -93,9 +93,9 @@ function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[])
  * @param property
  * @param indent
  */
-function genProperty(mixinName: string, property: Property): string | undefined {
-  if (property.privacy === 'private' || property.inheritedFrom != null) {
-    return;
+function genProperty(mixinName: string, property: Property): string {
+  if (property.privacy === 'private' || property.inheritedFrom) {
+    return '';
   }
   return `/** @type {${property.type}} */\n${mixinName}.prototype.${property.name};\n`;
 }
@@ -106,19 +106,21 @@ function genProperty(mixinName: string, property: Property): string | undefined 
  * @param method
  * @param indent
  */
-function genMethod(mixinName: string, method: Method): string | undefined {
-  let override = false;
+function genMethod(mixinName: string, method: Method): string {
   if (method.privacy === 'private') {
-    return;
+    return '';
   }
-  if (method.jsdoc && method.jsdoc.tags && method.jsdoc.tags.some(t => t.title === 'override')) {
+  let override = false;
+  if (method.jsdoc && method.jsdoc.tags.some(t => t.title === 'override')) {
     override = true;
   }
   let out = ['/**'];
+  let docParams = true;
   if (override) {
     out.push('* @override');
+    docParams = Boolean(method.jsdoc && method.jsdoc.tags.some(t => t.title === 'param'));
   }
-  if (method.params) {
+  if (method.params && docParams) {
     method.params.forEach(p => out.push(genParameter(p)));
   }
   const returnType = method.return && method.return.type;
@@ -145,8 +147,9 @@ function cleanVarArgs(name: string) {
  *
  * @param parameter
  */
-function genParameter(parameter: { name: string; type?: string; }) {
-  return `* @param {${parameter.type || '*'}} ${cleanVarArgs(parameter.name)}`;
+function genParameter(parameter: { name: string; type?: string; description?: string }) {
+  let implicitType = parameter.name.startsWith('...') ? '...*' : '*';
+  return `* @param {${parameter.type || implicitType}} ${cleanVarArgs(parameter.name)} ${parameter.description || ''}`;
 }
 
 function getNamespaceAndName(name: string): { name?: string, namespace?: string } {
