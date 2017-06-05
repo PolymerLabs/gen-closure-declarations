@@ -13,10 +13,10 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "escodegen": "^1.8.1",
-    "polymer-analyzer": "^2.0.2"
+    "polymer-analyzer": "^2.1.0"
   },
   "devDependencies": {
-    "typescript": "^2.3.3"
+    "typescript": "^2.3.4"
   },
   "scripts": {
     "build": "tsc",

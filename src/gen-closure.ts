@@ -84,6 +84,13 @@ function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[])
     }
   });
 
+  mixin.staticMethods.forEach((method) => {
+    const methodText = genStaticMethod(mixinName, method);
+    if (methodText) {
+      mixinDesc.push(methodText);
+    }
+  })
+
   declarations.push(mixinDesc.join('\n'));
 }
 
@@ -91,7 +98,6 @@ function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[])
  * Property
  *
  * @param property
- * @param indent
  */
 function genProperty(mixinName: string, property: Property): string {
   if (property.privacy === 'private' || property.inheritedFrom) {
@@ -104,7 +110,6 @@ function genProperty(mixinName: string, property: Property): string {
  * Method
  *
  * @param method
- * @param indent
  */
 function genMethod(mixinName: string, method: Method): string {
   if (method.privacy === 'private') {
@@ -132,6 +137,38 @@ function genMethod(mixinName: string, method: Method): string {
     ? method.params.map((p) => cleanVarArgs(p.name)).join(', ')
     : '';
   out.push(`${mixinName}.prototype.${method.name} = function(${paramText}){};`);
+  return out.join('\n');
+}
+
+/**
+ * Static Method
+ */
+function genStaticMethod(mixinName: string, method: Method): string {
+  if (method.privacy === 'private') {
+    return '';
+  }
+  let override = false;
+  if (method.jsdoc && method.jsdoc.tags.some(t => t.title === 'override')) {
+    override = true;
+  }
+  let out = ['/**'];
+  let docParams = true;
+  if (override) {
+    out.push('* @override');
+    docParams = Boolean(method.jsdoc && method.jsdoc.tags.some(t => t.title === 'param'));
+  }
+  if (method.params && docParams) {
+    method.params.forEach(p => out.push(genParameter(p)));
+  }
+  const returnType = method.return && method.return.type;
+  if (returnType) {
+    out.push(`* @return {${returnType}}`);
+  }
+  out.push('*/');
+  const paramText = method.params
+    ? method.params.map((p) => cleanVarArgs(p.name)).join(', ')
+    : '';
+  out.push(`${mixinName}.${method.name} = function(${paramText}){};`);
   return out.join('\n');
 }
 
