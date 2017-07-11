@@ -23,7 +23,6 @@ const header =
 `
 /**
  * @fileoverview Closure types for Polymer mixins
- * @externs
  *
  * This file is generated, do not edit manually
  */
@@ -59,7 +58,7 @@ function generatePackage(pkg: Analysis):string {
 function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[]) {
   const {name, namespace} = getNamespaceAndName(mixin.name);
   let mixinName = `${namespace}_${name}`;
-  let mixinDesc = ['/**', '* @record'];
+  let mixinDesc = ['/**', '* @interface'];
 
   if (mixin.mixins && mixin.mixins.length > 0) {
     mixin.mixins.forEach((m) => {
@@ -131,6 +130,9 @@ function genMethod(mixinName: string, method: Method): string {
   const returnType = method.return && method.return.type;
   if (returnType) {
     out.push(`* @return {${returnType}}`);
+  }
+  if (docParams && (!method.params || !method.params.length) && !returnType) {
+    out.push('* @return {undefined}');
   }
   out.push('*/');
   const paramText = method.params
