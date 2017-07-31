@@ -99,7 +99,7 @@ function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[])
  * @param property
  */
 function genProperty(mixinName: string, property: Property): string {
-  if (property.privacy === 'private' || property.inheritedFrom) {
+  if (property.inheritedFrom) {
     return '';
   }
   return `/** @type {${property.type}} */\n${mixinName}.prototype.${property.name};\n`;
