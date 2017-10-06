@@ -22,9 +22,10 @@ const isTest = (f: Feature) => f.sourceRange && isInTestsRegex.test(f.sourceRang
 const header =
 `
 /**
- * @fileoverview Closure types for Polymer mixins
+ * @fileoverview Closure interfaces for Polymer mixins
+ * @externs
  *
- * This file is generated, do not edit manually
+ * This file is generated, do not edit
  */
 /* eslint-disable no-unused-vars, strict */
 `;
@@ -84,7 +85,7 @@ function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[])
   });
 
   mixin.staticMethods.forEach((method) => {
-    const methodText = genStaticMethod(mixinName, method);
+    const methodText = genMethod(mixinName, method, true);
     if (methodText) {
       mixinDesc.push(methodText);
     }
@@ -110,8 +111,8 @@ function genProperty(mixinName: string, property: Property): string {
  *
  * @param method
  */
-function genMethod(mixinName: string, method: Method): string {
-  if (method.privacy === 'private') {
+function genMethod(mixinName: string, method: Method, isStatic = false): string {
+  if (method.privacy === 'private' || method.inheritedFrom) {
     return '';
   }
   let override = false;
@@ -138,39 +139,7 @@ function genMethod(mixinName: string, method: Method): string {
   const paramText = method.params
     ? method.params.map((p) => cleanVarArgs(p.name)).join(', ')
     : '';
-  out.push(`${mixinName}.prototype.${method.name} = function(${paramText}){};`);
-  return out.join('\n');
-}
-
-/**
- * Static Method
- */
-function genStaticMethod(mixinName: string, method: Method): string {
-  if (method.privacy === 'private') {
-    return '';
-  }
-  let override = false;
-  if (method.jsdoc && method.jsdoc.tags.some(t => t.title === 'override')) {
-    override = true;
-  }
-  let out = ['/**'];
-  let docParams = true;
-  if (override) {
-    out.push('* @override');
-    docParams = Boolean(method.jsdoc && method.jsdoc.tags.some(t => t.title === 'param'));
-  }
-  if (method.params && docParams) {
-    method.params.forEach(p => out.push(genParameter(p)));
-  }
-  const returnType = method.return && method.return.type;
-  if (returnType) {
-    out.push(`* @return {${returnType}}`);
-  }
-  out.push('*/');
-  const paramText = method.params
-    ? method.params.map((p) => cleanVarArgs(p.name)).join(', ')
-    : '';
-  out.push(`${mixinName}.${method.name} = function(${paramText}){};`);
+  out.push(`${mixinName}${!isStatic ? '.prototype' : ''}.${method.name} = function(${paramText}){};`);
   return out.join('\n');
 }
 
