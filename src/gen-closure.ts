@@ -9,38 +9,35 @@
  */
 // Requires node >= 7.6
 
-import { Analyzer, Feature, FSUrlLoader, PackageUrlResolver, Property, Method, PolymerElementMixin } from 'polymer-analyzer';
+import { Analyzer, Feature, FSUrlLoader, Property, Method, PolymerElementMixin } from 'polymer-analyzer';
 
 import {Analysis} from 'polymer-analyzer/lib/model/model';
 
 const isInTestsRegex = /(\b|\/|\\)(test[s]?)(\/|\\)/;
 const isTest = (f: Feature) => f.sourceRange && isInTestsRegex.test(f.sourceRange.file);
 
-// const declarationKinds = ['element', 'element-mixin', 'namespace', 'function'];
-// const isDeclaration = (f: Feature) => declarationKinds.some((kind) => f.kinds.has(kind));
+export interface Options {
+  entrypoint?: string;
+  directory?: string;
+}
 
-const header =
-`
-/**
- * @fileoverview Closure interfaces for Polymer mixins
- * @externs
- *
- * This file is generated, do not edit
- */
-/* eslint-disable no-unused-vars, strict */
-`;
+export function generateDeclarations(options: Options = {}):Promise<string> {
+  const urlLoader = new FSUrlLoader(options.directory);
+  const analyzer = new Analyzer({urlLoader});
 
-export function generateDeclarations():Promise<string> {
-  const analyzer = new Analyzer({
-    urlLoader: new FSUrlLoader(),
-    urlResolver: new PackageUrlResolver(),
-  });
+  let analysisPromise: Promise<Analysis>;
 
-  return analyzer.analyzePackage().then(generatePackage);
+  if (options.entrypoint) {
+    analysisPromise = analyzer.analyze([options.entrypoint]);
+  } else {
+    analysisPromise = analyzer.analyzePackage();
+  }
+
+  return analysisPromise.then(generatePackage);
 }
 
 function generatePackage(pkg: Analysis):string {
-  const declarations:string[] = [header];
+  const declarations:string[] = [];
 
   const features = pkg.getFeatures();
   for (const feature of features) {
@@ -94,11 +91,6 @@ function genMixinDeclaration(mixin: PolymerElementMixin, declarations: string[])
   declarations.push(mixinDesc.join('\n'));
 }
 
-/**
- * Property
- *
- * @param property
- */
 function genProperty(mixinName: string, property: Property): string {
   if (property.inheritedFrom) {
     return '';
@@ -106,11 +98,6 @@ function genProperty(mixinName: string, property: Property): string {
   return `/** @type {${property.type}} */\n${mixinName}.prototype.${property.name};\n`;
 }
 
-/**
- * Method
- *
- * @param method
- */
 function genMethod(mixinName: string, method: Method, isStatic = false): string {
   if (method.privacy === 'private' || method.inheritedFrom) {
     return '';
@@ -150,11 +137,6 @@ function cleanVarArgs(name: string) {
   return name;
 }
 
-/**
- * Parameter
- *
- * @param parameter
- */
 function genParameter(parameter: { name: string; type?: string; description?: string }) {
   let implicitType = parameter.name.startsWith('...') ? '...*' : '*';
   return `* @param {${parameter.type || implicitType}} ${cleanVarArgs(parameter.name)} ${parameter.description || ''}`;
