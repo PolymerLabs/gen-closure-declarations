@@ -9,7 +9,7 @@
  */
 // Requires node >= 7.6
 
-import { Analyzer, Feature, FSUrlLoader, Property, Method, PolymerElementMixin } from 'polymer-analyzer';
+import { Analyzer, Feature, FsUrlLoader, Property, Method, PolymerElementMixin } from 'polymer-analyzer';
 
 import {Analysis} from 'polymer-analyzer/lib/model/model';
 
@@ -22,7 +22,7 @@ export interface Options {
 }
 
 export function generateDeclarations(options: Options = {}):Promise<string> {
-  const urlLoader = new FSUrlLoader(options.directory);
+  const urlLoader = new FsUrlLoader(options.directory);
   const analyzer = new Analyzer({urlLoader});
 
   let analysisPromise: Promise<Analysis>;
