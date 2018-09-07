@@ -152,5 +152,5 @@ function getNamespaceAndName(name: string): { name?: string, namespace?: string 
       };
     }
   }
-  return { name };
+  return { name, namespace: 'Polymer' };
 }
